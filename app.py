@@ -1,46 +1,43 @@
 import streamlit as st
-import json
 
-FILE_PATH = "tasks.json"
+st.set_page_config(page_title="To-Do", page_icon="✅")
 
-def load_tasks():
-    try:
-        with open(FILE_PATH, "r") as file:
-            return json.load(file)
-    except FileNotFoundError:
-        return []
+# Initialize session state
+if "tasks" not in st.session_state:
+    st.session_state.tasks = []
+if "just_updated" not in st.session_state:
+    st.session_state.just_updated = False
 
-def save_tasks(tasks_to_save):
-    with open(FILE_PATH, "w") as file:
-        json.dump(tasks_to_save, file)
+st.title("To-Do")
 
-# A variable to store our tasks
-if 'tasks' not in st.session_state:
-    st.session_state.tasks = load_tasks()
+# Add task (using form to avoid flash + no need for rerun)
+with st.form("add_task_form", clear_on_submit=True):
+    new_task = st.text_input("Add a task")
+    submitted = st.form_submit_button("Add Task")
+    if submitted and new_task.strip():
+        st.session_state.tasks.append(new_task.strip())
+        st.session_state.just_updated = True
+        # No rerun needed here
 
-st.title("To-Do List App")
-st.markdown("---")
+st.subheader("Your tasks")
 
-new_task = st.text_input("Enter a new task:")
-add_button = st.button("Add Task")
+# Render and delete tasks
+for i, task in enumerate(st.session_state.tasks):
+    cols = st.columns([1, 8, 2])
+    cols[1].write(task)
+    if cols[2].button("Delete", key=f"del_{i}"):
+        st.session_state.tasks.pop(i)
+        st.session_state.just_updated = True
+        st.rerun()  # keep this to avoid index shift issues after delete
 
-if add_button and new_task:
-    st.session_state.tasks.append([new_task, False])
-    save_tasks(st.session_state.tasks)
-    st.experimental_rerun()
+# Soft feedback without breaking flow
+if st.session_state.just_updated:
+    st.session_state.just_updated = False
+    st.toast("Updated!", icon="✅")
 
-st.header("Your Tasks")
-for index, task in enumerate(st.session_state.tasks):
-    col1, col2 = st.columns([0.8, 0.2])
-    with col1:
-        checkbox_state = st.checkbox(task[0], value=task[1], key=f"checkbox_{index}")
-    with col2:
-        if st.button("Delete", key=f"delete_{index}"):
-            del st.session_state.tasks[index]
-            save_tasks(st.session_state.tasks)
-            st.experimental_rerun()
 
     if checkbox_state != task[1]:
         st.session_state.tasks[index][1] = checkbox_state
         save_tasks(st.session_state.tasks)
+
         st.experimental_rerun()
