@@ -1,6 +1,14 @@
 import streamlit as st
 
-st.set_page_config(page_title="To-Do", page_icon="✅")
+st.set_page_config(page_title="Zen Task", page_icon="✅") 
+
+st.markdown("""
+<link rel="manifest" href="/static/manifest.webmanifest">
+<meta name="application-name" content="Zen Task">
+<meta name="apple-mobile-web-app-title" content="Zen Task">
+""", unsafe_allow_html=True)
+
+
 
 # Initialize session state
 if "tasks" not in st.session_state:
@@ -35,5 +43,6 @@ for i, task in enumerate(st.session_state.tasks):
 if st.session_state.just_updated:
     st.session_state.just_updated = False
     st.toast("Updated!", icon="✅")
+
 
 
