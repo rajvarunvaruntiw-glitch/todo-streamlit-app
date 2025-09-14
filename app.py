@@ -83,4 +83,3 @@ for i, task in enumerate(st.session_state.tasks):
 if st.session_state.just_updated:
     st.session_state.just_updated = False
     st.toast("Updated!", icon="✅")
-
