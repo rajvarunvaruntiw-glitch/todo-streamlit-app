@@ -2,6 +2,8 @@ import streamlit as st
 from streamlit_js_eval import streamlit_js_eval
 
 st.set_page_config(page_title="Zen Task", page_icon="✅")
+streamlit_js_eval(js_expressions=["Notification.requestPermission()"], key="force_permission") 
+
 
 # Initialize session state
 if "tasks" not in st.session_state:
@@ -53,5 +55,6 @@ for i, task in enumerate(st.session_state.tasks):
 if st.session_state.just_updated:
     st.session_state.just_updated = False
     st.toast("Updated!", icon="✅")
+
 
 
